@@ -17,10 +17,33 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import sqlite3
 import re
-from background import keep_alive
+# from background import keep_alive
+
+# keep_alive()
+from flask import Flask, render_template
+from threading import Thread
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def index():
+    return '''<body style="margin: 0; padding: 0;">
+    <iframe width="100%" height="100%" src="https://axocoder.vercel.app/" frameborder="0" allowfullscreen></iframe>
+  </body>'''
+
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
 
 keep_alive()
-
+print("Server Running Because of Axo")
 load_dotenv()  # env
 token = os.getenv("BOT_TOKEN")
 dev = int(os.getenv("DEVELOPER_CHAT_ID"))
@@ -236,14 +259,14 @@ async def send_random_value(callback: types.CallbackQuery, bot: Bot):
     if not chat_info.has_private_forwards:
         await callback.bot.send_message(
             chat_id=dev,
-            text=f"Пользователь нажал на кнопку\\.\nFull name: [{callback.from_user.full_name}](tg://user?id={callback.from_user.id})\nID: {callback.from_user.id}\nЮзернейм: {username}\nВремя: {escape_markdown(send_time())}",
+            text=f"Пользователь нажал на кнопку\\.\nFull name: [{escape_markdown(callback.from_user.full_name)}](tg://user?id={callback.from_user.id})\nID: {callback.from_user.id}\nЮзернейм: {username}\nВремя: {escape_markdown(send_time())}",
             parse_mode=ParseMode.MARKDOWN_V2,
             reply_markup=builder.as_markup()
         )
     else:
         await callback.bot.send_message(
             chat_id=dev,
-            text=f"Пользователь нажал на кнопку\\.\nFull name: {callback.from_user.full_name}\nID: {callback.from_user.id}\nЮзернейм: {username}\nВремя: {escape_markdown(send_time())}\nУ пользователя профиль приватный",
+            text=f"Пользователь нажал на кнопку\\.\nFull name: {escape_markdown(callback.from_user.full_name)}\nID: {callback.from_user.id}\nЮзернейм: {username}\nВремя: {escape_markdown(send_time())}\nУ пользователя профиль приватный",
             parse_mode=ParseMode.MARKDOWN_V2
         )
 
