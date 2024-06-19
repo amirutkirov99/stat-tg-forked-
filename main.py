@@ -1,22 +1,26 @@
-import re
-import sqlite3
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram import Bot, Dispatcher, types, F
-from aiogram.types import FSInputFile
-from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram.types import ReplyKeyboardRemove
-from aiogram.enums import ParseMode
-from aiogram.methods.send_message import SendMessage
-from aiogram import F
-from aiogram.filters.command import Command
-from aiogram import Bot, Dispatcher, types
-import logging
-import asyncio
-import pytz
-from datetime import datetime
-import json
-import os
 from dotenv import load_dotenv
+import os
+import json
+from datetime import datetime
+import pytz
+import asyncio
+import logging
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters.command import Command
+from aiogram import F
+from aiogram.methods.send_message import SendMessage
+from aiogram.enums import ParseMode
+from aiogram.types import ReplyKeyboardRemove
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import FSInputFile
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+import sqlite3
+import re
+from background import keep_alive
+
+keep_alive()
+
 load_dotenv()  # env
 token = os.getenv("BOT_TOKEN")
 dev = int(os.getenv("DEVELOPER_CHAT_ID"))
