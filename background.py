@@ -59,8 +59,9 @@ def print_hello():
         
         time.sleep(60)  # Подождать 60 секунд (1 минута)
 
-def start_all():
+def keep_alive():
     # Запускаем Flask приложение в отдельном потоке
+    download_file_from_github()
     flask_thread = Thread(target=run)
     flask_thread.start()
 
