@@ -54,10 +54,11 @@ def run():
 
 def print_hello():
     while True:
+        time.sleep(40)
         upload_file_to_github()
         download_file_from_github()
         
-        time.sleep(60)  # Подождать 60 секунд (1 минута)
+          # Подождать 60 секунд (1 минута)
 
 def keep_alive():
     # Запускаем Flask приложение в отдельном потоке
