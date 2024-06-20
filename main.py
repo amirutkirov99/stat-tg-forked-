@@ -17,32 +17,33 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import sqlite3
 import re
-# from background import keep_alive
-
-# keep_alive()
 from flask import Flask, render_template
 from threading import Thread
-
-app = Flask(__name__)
-
-
-@app.route('/')
-def index():
-    return '''<body style="margin: 0; padding: 0;">
-    <iframe width="100%" height="100%" src="https://axocoder.vercel.app/" frameborder="0" allowfullscreen></iframe>
-  </body>'''
-
-
-def run():
-    app.run(host='0.0.0.0', port=8080)
-
-
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-
+from background import keep_alive
 
 keep_alive()
+
+
+# app = Flask(__name__)
+
+
+# @app.route('/')
+# def index():
+#     return '''<body style="margin: 0; padding: 0;">
+#     <iframe width="100%" height="100%" src="https://axocoder.vercel.app/" frameborder="0" allowfullscreen></iframe>
+#   </body>'''
+
+
+# def run():
+#     app.run(host='0.0.0.0', port=8080)
+
+
+# def keep_alive():
+#     t = Thread(target=run)
+#     t.start()
+
+
+# keep_alive()
 print("Server Running Because of Axo")
 load_dotenv()  # env
 token = os.getenv("BOT_TOKEN")
