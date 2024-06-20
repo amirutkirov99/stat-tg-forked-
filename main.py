@@ -394,9 +394,9 @@ async def send_random_value(callback: types.CallbackQuery):
                         url=f"tg://user?id={user[0]}"
                     )
                 )
-                text = f"Пользователь нажал на кнопку\\.\nFull name: [{user[1]}](tg://user?id={user[0]})\nID: [{user[0]}]\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}"
+                text = f"Пользователь нажал на кнопку\\.\nFull name: [{escape_markdown(user[1])}](tg://user?id={user[0]})\nID: [{user[0]}]\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}"
             else:
-                text = f"Пользователь нажал на кнопку\\.\nFull name: {user[1]}\nID: {user[0]}\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}\nУ пользователя профиль приватный"
+                text = f"Пользователь нажал на кнопку\\.\nFull name: {escape_markdown(user[1])}\nID: {user[0]}\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}\nУ пользователя профиль приватный"
 
             await callback.message.edit_text(
                 text=text,
