@@ -229,19 +229,20 @@ async def without_puree(message: types.Message):
 
 @dp.message(Command("publish"))
 async def cmd_random(message: types.Message):
-    builder = InlineKeyboardBuilder()
-    button_text = "❤️"
-    callback_data = json.dumps({'action': 'chanel_value', 'text': button_text})
-    builder.add(types.InlineKeyboardButton(
-        text=button_text,
-        callback_data=callback_data)
-    )
-    await message.reply("Опубликовано!")
-    await bot.send_message(
-        chat_id=chanel,
-        text=message.text.replace("/publish ", ""),
-        reply_markup=builder.as_markup()
-    )
+    if message.from_user.id == dev:
+        builder = InlineKeyboardBuilder()
+        button_text = "❤️"
+        callback_data = json.dumps({'action': 'chanel_value', 'text': button_text})
+        builder.add(types.InlineKeyboardButton(
+            text=button_text,
+            callback_data=callback_data)
+        )
+        await message.reply("Опубликовано!")
+        await bot.send_message(
+            chat_id=chanel,
+            text=message.text.replace("/publish ", ""),
+            reply_markup=builder.as_markup()
+        )
 
 
 @dp.callback_query(F.data.func(lambda data: json.loads(data).get('action') == "chanel_value"))
@@ -315,7 +316,8 @@ MAX_USERS_PER_PAGE = 3
 
 @dp.message(Command("users"))
 async def cmd_inline_url(message: types.Message):
-    await send_user_list(message)
+    if message.from_user.id == dev:
+        await send_user_list(message)
 
 
 async def send_user_list(message: types.Message, page: int = 0, edit_message_id=None):
