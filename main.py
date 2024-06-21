@@ -216,15 +216,17 @@ async def with_puree(message: types.Message):
 
 @dp.message(F.text.lower() == "получить список пользователей")
 async def without_puree(message: types.Message):
-    save_users_to_file(filename)
-    document = FSInputFile(filename)
-    await bot.send_document(
-        chat_id=dev,
-        caption=f"Юзеры\nАктуальный на {escape_markdown(send_time())}",
-        document=document,
-        parse_mode=ParseMode.MARKDOWN_V2
-
-    )
+    if message.from_user.id == dev:
+        save_users_to_file(filename)
+        document = FSInputFile(filename)
+        await bot.send_document(
+            chat_id=dev,
+            caption=f"Юзеры\nАктуальный на {escape_markdown(send_time())}",
+            document=document,
+            parse_mode=ParseMode.MARKDOWN_V2
+        )
+    else:
+        await message.reply("У вас недостаточно прав чтобы выполнить эту команду!")
 
 
 @dp.message(Command("publish"))
