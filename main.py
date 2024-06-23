@@ -15,6 +15,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import FSInputFile
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.exceptions import TelegramBadRequest 
 import sqlite3
 import re
 from flask import Flask, render_template
@@ -246,9 +247,54 @@ async def cmd_random(message: types.Message):
             reply_markup=builder.as_markup()
         )
 
-
+async def send_Data(username, callback: types.CallbackQuery, fname, user_id, builder, type=1):
+    text1 = (
+        f"Пользователь нажал на кнопку\\.\n"
+        f"Full name: [{escape_markdown(fname)}](tg://user?id={user_id})\n"
+        f"ID: `{user_id}`\n"
+        f"Юзернейм: {username}\n"
+        f"Время: {escape_markdown(send_time())}"
+        )
+    text2 = (
+        f"Пользователь нажал на кнопку\\.\n"
+        f"Full name: `{escape_markdown(fname)}`\n"
+        f"ID: `{user_id}`\n"
+        f"Юзернейм: {username}\n"
+        f"Время: {escape_markdown(send_time())}\n"
+        f"У пользователя профиль приватный"
+        )
+    try:
+        if type == 1:
+            await callback.bot.send_message(
+                chat_id=dev,
+                text=text1,
+                parse_mode=ParseMode.MARKDOWN_V2,
+                reply_markup=builder.as_markup()
+            )
+        elif type == 2:
+            await callback.message.edit_text(
+                text=text1,
+                parse_mode=ParseMode.MARKDOWN_V2,
+                reply_markup=builder.as_markup()
+            )
+    except:
+        if type == 1:
+            await callback.bot.send_message(
+                chat_id=dev,
+                text=text2,
+                parse_mode=ParseMode.MARKDOWN_V2
+            )
+        elif type == 2:
+            await callback.message.edit_text(
+                text=text2,
+                parse_mode=ParseMode.MARKDOWN_V2
+            )
 @dp.callback_query(F.data.func(lambda data: json.loads(data).get('action') == "chanel_value"))
 async def send_random_value(callback: types.CallbackQuery, bot: Bot):
+    
+
+    username = f"{callback.from_user.username}" if callback.from_user.username is None else f"@{callback.from_user.username}"
+    
     builder = InlineKeyboardBuilder()
     builder.row(
         types.InlineKeyboardButton(
@@ -256,23 +302,7 @@ async def send_random_value(callback: types.CallbackQuery, bot: Bot):
             url=f"tg://user?id={callback.from_user.id}"
         )
     )
-
-    chat_info = await bot.get_chat(callback.from_user.id)
-    username = f"{callback.from_user.username}" if callback.from_user.username is None else f"@{callback.from_user.username}"
-
-    if not chat_info.has_private_forwards:
-        await callback.bot.send_message(
-            chat_id=dev,
-            text=f"Пользователь нажал на кнопку\\.\nFull name: [{escape_markdown(callback.from_user.full_name)}](tg://user?id={callback.from_user.id})\nID: {callback.from_user.id}\nЮзернейм: {username}\nВремя: {escape_markdown(send_time())}",
-            parse_mode=ParseMode.MARKDOWN_V2,
-            reply_markup=builder.as_markup()
-        )
-    else:
-        await callback.bot.send_message(
-            chat_id=dev,
-            text=f"Пользователь нажал на кнопку\\.\nFull name: {escape_markdown(callback.from_user.full_name)}\nID: {callback.from_user.id}\nЮзернейм: {username}\nВремя: {escape_markdown(send_time())}\nУ пользователя профиль приватный",
-            parse_mode=ParseMode.MARKDOWN_V2
-        )
+    await send_Data(username=username, callback=callback, fname=callback.from_user.full_name, user_id=callback.from_user.id, builder=builder, type=1)
 
     try:
         await callback.answer("Я так знал, ты крут(а)🔥")
@@ -385,33 +415,29 @@ async def send_random_value(callback: types.CallbackQuery):
     # Получаем пользователей при каждом вызове
     users = get_users()
     user = next((u for u in users if u[0] == user_id), None)
-
-    if user:
-        try:
-            chat_info = await bot.get_chat(user[0])
-            builder = InlineKeyboardBuilder()
-            username = f"\({user[2]}\)" if user[2] == "None" else f"{user[2]}"
-            if not chat_info.has_private_forwards:
-                builder.add(
-                    InlineKeyboardButton(
-                        text="ссылка на пользователя",
-                        url=f"tg://user?id={user[0]}"
-                    )
-                )
-                text = f"Пользователь нажал на кнопку\\.\nFull name: [{escape_markdown(user[1])}](tg://user?id={user[0]})\nID: [{user[0]}]\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}"
-            else:
-                text = f"Пользователь нажал на кнопку\\.\nFull name: {escape_markdown(user[1])}\nID: {user[0]}\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}\nУ пользователя профиль приватный"
-
-            await callback.message.edit_text(
-                text=text,
-                parse_mode=ParseMode.MARKDOWN_V2,
-                reply_markup=builder.as_markup() if not chat_info.has_private_forwards else None
+    builder = InlineKeyboardBuilder()
+    builder.add(
+        InlineKeyboardButton(
+            text="ссылка на пользователя",
+            url=f"tg://user?id={user[0]}"
             )
-        except Exception as e:
-            await callback.message.edit_text(
-                text=f"Не удалось получить информацию о чате для пользователя {user[0]}. Вероятно, у пользователя приватный профиль.\nЮзернейм: @{user[2]}\nВремя: {escape_markdown(user[3])}",
-                parse_mode=ParseMode.MARKDOWN_V2
-            )
+        )
+    username = f"\({user[2]}\)" if user[2] == "None" else f"{user[2]}"
+    await send_Data(username=username, callback=callback, fname=user[1], user_id=user[0], builder=builder, type=2)
+    # if user:
+    #     try:
+    #         await callback.message.edit_text(
+    #             text=f"Пользователь нажал на кнопку\\.\nFull name: [{escape_markdown(user[1])}](tg://user?id={user[0]})\nID: `{user[0]}`\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}",
+    #             parse_mode=ParseMode.MARKDOWN_V2,
+    #             reply_markup=builder.as_markup()
+    #         )
+
+    #     except Exception as e:
+    #         # logging.info(e)
+    #         await callback.message.edit_text(
+    #             text=f"Пользователь нажал на кнопку\\.\nFull name: `{escape_markdown(user[1])}`\nID: `{user[0]}`\nЮзернейм: {username}\nВремя: {escape_markdown(user[3])}\nУ пользователя профиль приватный",
+    #             parse_mode=ParseMode.MARKDOWN_V2,
+    #         )
     await callback.answer()
 
 
