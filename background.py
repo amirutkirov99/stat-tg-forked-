@@ -35,22 +35,37 @@ def is_file_changed_locally():
 
 
 def download_file_from_github():
-    if is_file_changed_locally():
-        # Инициализация объекта GitHub с использованием персонального токена
-        g = Github('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')
-        
-        # Получаем репозиторий
-        repo = g.get_user().get_repo('tg_ystal_db')
-        
-        # Получаем содержимое файла users.db
-        contents = repo.get_contents('users.db')
-        
-        # Скачиваем файл
-        with open('users.db', 'wb') as file:
-            file.write(contents.decoded_content)
-            print('File downloaded successfully.')
-    else:
-        pass
+    try:
+        if is_file_changed_locally():
+            # Инициализация объекта GitHub с использованием персонального токена
+            g = Github('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')
+            
+            # Получаем репозиторий
+            repo = g.get_user().get_repo('tg_ystal_db')
+            
+            # Получаем содержимое файла users.db
+            contents = repo.get_contents('users.db')
+            
+            # Скачиваем файл
+            with open('users.db', 'wb') as file:
+                file.write(contents.decoded_content)
+                print('File downloaded successfully.')
+        else:
+            pass
+    except Exception as e:
+        if "No such file or directory: 'users.db'" in str(e):
+            g = Github('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')
+            
+            # Получаем репозиторий
+            repo = g.get_user().get_repo('tg_ystal_db')
+            
+            # Получаем содержимое файла users.db
+            contents = repo.get_contents('users.db')
+            
+            # Скачиваем файл
+            with open('users.db', 'wb') as file:
+                file.write(contents.decoded_content)
+                print('File downloaded successfully.')
 
 def upload_file_to_github():
     if is_file_changed_locally():
