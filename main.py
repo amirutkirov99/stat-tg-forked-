@@ -21,6 +21,7 @@ import re
 from flask import Flask, render_template
 from threading import Thread
 from background import keep_alive
+from aiogram.types import BotCommand, BotCommandScopeDefault, BotCommandScopeChat
 
 keep_alive()
 
@@ -50,6 +51,7 @@ load_dotenv()  # env
 token = os.getenv("BOT_TOKEN")
 dev = int(os.getenv("DEVELOPER_CHAT_ID"))
 chanel = int(os.getenv("CHANNEL_ID"))
+admins = list(map(int, os.getenv('ADMINS').split(',')))
 
 
 def create_users_table():
@@ -192,10 +194,39 @@ dp = Dispatcher()
 
 # Хэндлер на команду /start
 
+async def set_commands(
+        bot: Bot,
+        user_id,
+        admins = admins
+) -> None:
+    commands = [
+        BotCommand(
+            command="start",
+            description="Перезапустить бота!"
+        ),
+    ]
+    await bot.set_my_commands(commands=commands, scope=BotCommandScopeDefault())
+    await bot.set_my_commands(commands=commands, scope=BotCommandScopeChat(chat_id=user_id))
+    for admin in admins:
+        commands.append(
+            BotCommand(
+                command="users",
+                description="Посмотреть список пользователей"
+            )
+        )
+        commands.append(
+            BotCommand(
+                command="publish",
+                description="Опубликовать новый запись"
+            )
+        )
+        await bot.set_my_commands(commands=commands, scope=BotCommandScopeChat(chat_id=admin))
+
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    if message.from_user.id == dev:
+    await set_commands(bot, user_id=message.from_user.id)
+    if message.from_user.id in admins:
         kb = [
             [types.KeyboardButton(text="Опубликовать кнопку")],
             [types.KeyboardButton(text="Получить список пользователей")]
@@ -217,11 +248,11 @@ async def with_puree(message: types.Message):
 
 @dp.message(F.text.lower() == "получить список пользователей")
 async def without_puree(message: types.Message):
-    if message.from_user.id == dev:
+    if message.from_user.id in admins:
         save_users_to_file(filename)
         document = FSInputFile(filename)
         await bot.send_document(
-            chat_id=dev,
+            chat_id=message.from_user.id,
             caption=f"Юзеры\nАктуальный на {escape_markdown(send_time())}",
             document=document,
             parse_mode=ParseMode.MARKDOWN_V2
@@ -232,7 +263,7 @@ async def without_puree(message: types.Message):
 
 @dp.message(Command("publish"))
 async def cmd_random(message: types.Message):
-    if message.from_user.id == dev:
+    if message.from_user.id in admins:
         builder = InlineKeyboardBuilder()
         button_text = "❤️"
         callback_data = json.dumps({'action': 'chanel_value', 'text': button_text})
@@ -240,12 +271,15 @@ async def cmd_random(message: types.Message):
             text=button_text,
             callback_data=callback_data)
         )
-        await message.reply("Опубликовано!")
-        await bot.send_message(
-            chat_id=chanel,
-            text=message.text.replace("/publish ", ""),
-            reply_markup=builder.as_markup()
-        )
+        if message.text != "/publish":
+            await message.reply("Опубликовано!")
+            await bot.send_message(
+                chat_id=chanel,
+                text=message.text.replace("/publish ", ""),
+                reply_markup=builder.as_markup()
+            )
+        elif message.text == "/publish" or message.text == "/publish ":
+            await message.reply("Нельзя опубликовать пустое слово!")
 
 async def send_Data(username, callback: types.CallbackQuery, fname, user_id, builder, type=1):
     text1 = (
@@ -348,7 +382,7 @@ MAX_USERS_PER_PAGE = 3
 
 @dp.message(Command("users"))
 async def cmd_inline_url(message: types.Message):
-    if message.from_user.id == dev:
+    if message.from_user.id in admins:
         await send_user_list(message)
 
 
