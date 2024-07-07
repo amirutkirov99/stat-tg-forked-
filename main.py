@@ -286,14 +286,14 @@ async def send_Data(username, callback: types.CallbackQuery, fname, user_id, bui
         f"Пользователь нажал на кнопку\\.\n"
         f"Full name: [{escape_markdown(fname)}](tg://user?id={user_id})\n"
         f"ID: `{user_id}`\n"
-        f"Юзернейм: {username}\n"
+        f"Юзернейм: {escape_markdown(username)}\n"
         f"Время: {escape_markdown(send_time())}"
         )
     text2 = (
         f"Пользователь нажал на кнопку\\.\n"
         f"Full name: `{escape_markdown(fname)}`\n"
         f"ID: `{user_id}`\n"
-        f"Юзернейм: {username}\n"
+        f"Юзернейм: {escape_markdown(username)}\n"
         f"Время: {escape_markdown(send_time())}\n"
         f"У пользователя профиль приватный"
         )
