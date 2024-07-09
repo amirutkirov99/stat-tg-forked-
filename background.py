@@ -10,9 +10,12 @@ import base64
 from dotenv import load_dotenv
 import os
 
+load_dotenv()  # env
+git_token = os.getenv("GIT_TOKEN")
+
 def is_file_changed_locally():
     # Инициализация объекта GitHub с использованием персонального токена
-    g = Github('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')
+    g = Github(git_token)
     
     # Получаем репозиторий
     repo = g.get_user().get_repo('tg_ystal_db')
@@ -41,7 +44,7 @@ def download_file_from_github():
     try:
         if is_file_changed_locally():
             # Инициализация объекта GitHub с использованием персонального токена
-            g = Github('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')
+            g = Github(git_token)
             
             # Получаем репозиторий
             repo = g.get_user().get_repo('tg_ystal_db')
@@ -57,7 +60,7 @@ def download_file_from_github():
             pass
     except Exception as e:
         if "No such file or directory: 'users.db'" in str(e):
-            g = Github('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')
+            g = Github(git_token)
             
             # Получаем репозиторий
             repo = g.get_user().get_repo('tg_ystal_db')
@@ -73,7 +76,7 @@ def download_file_from_github():
 def upload_file_to_github():
     if is_file_changed_locally():
         # Инициализация объекта GitHub с использованием персонального токена
-        g = Github('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')
+        g = Github(git_token)
         
         # Получаем репозиторий
         repo = g.get_user().get_repo('tg_ystal_db')
