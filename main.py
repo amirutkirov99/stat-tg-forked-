@@ -377,7 +377,7 @@ async def send_random_value(callback: types.CallbackQuery, bot: Bot):
         pass
 
 
-MAX_USERS_PER_PAGE = 3
+MAX_USERS_PER_PAGE = 10
 
 
 @dp.message(Command("users"))
