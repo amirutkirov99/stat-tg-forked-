@@ -7,6 +7,9 @@ from github import Github
 import hashlib
 import base64
 
+from dotenv import load_dotenv
+import os
+
 def is_file_changed_locally():
     # Инициализация объекта GitHub с использованием персонального токена
     g = Github('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')
